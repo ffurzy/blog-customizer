@@ -23,12 +23,12 @@ export const ArticleParamsForm = ({
 	currentSettings: ArticleStateType;
 	onApply: (s: ArticleStateType) => void;
 }) => {
-	const [isOpen, setIsOpen] = useState(false);
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [formState, setFormState] = useState(currentSettings);
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const handleToggle = () => {
-		setIsOpen((prev) => !prev);
+		setIsMenuOpen((prev) => !prev);
 	};
 
 	//закрываем при клике вне формы
@@ -39,11 +39,11 @@ export const ArticleParamsForm = ({
 				containerRef.current &&
 				!containerRef.current.contains(event.target as Node)
 			) {
-				setIsOpen(false);
+				setIsMenuOpen(false);
 			}
 		};
 
-		if (isOpen) {
+		if (isMenuOpen) {
 			document.addEventListener('mousedown', handleClickOutside);
 		} else {
 			document.removeEventListener('mousedown', handleClickOutside);
@@ -52,11 +52,11 @@ export const ArticleParamsForm = ({
 		return () => {
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
-	}, [isOpen]);
+	}, [isMenuOpen]);
 
 	const handleApply = () => {
 		onApply(formState);
-		setIsOpen(false);
+		setIsMenuOpen(false);
 	};
 
 	const handleReset = () => {
@@ -66,14 +66,19 @@ export const ArticleParamsForm = ({
 
 	return (
 		<>
-			<ArrowButton isOpen={isOpen} onClick={handleToggle} />
-			{isOpen && (
+			<ArrowButton isOpen={isMenuOpen} onClick={handleToggle} />
+			{isMenuOpen && (
 				<aside
 					ref={containerRef}
 					className={clsx(styles.container, {
-						[styles.container_open]: isOpen,
+						[styles.container_open]: isMenuOpen,
 					})}>
-					<form className={styles.form}>
+					<form
+						className={styles.form}
+						onSubmit={(e) => {
+							e.preventDefault();
+							handleApply();
+						}}>
 						<Text
 							as={'h2'}
 							size={31}
